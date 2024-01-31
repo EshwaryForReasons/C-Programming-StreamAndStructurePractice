@@ -13,11 +13,12 @@ struct Account
 
 const char* FILE_PATH = "../Data.txt";
 const int ACCOUNT_NUM = 10;
-Account** accounts = new Account*[ACCOUNT_NUM];
+int current_account_num = 0;
+Account* accounts[ACCOUNT_NUM];
 
 Account* id_to_account(int ID)
 {
-    for(int i = 0; i < ACCOUNT_NUM; ++i)
+    for(int i = 0; i < current_account_num; ++i)
     {
         if(accounts[i] && accounts[i]->ID == ID)
             return accounts[i];
@@ -56,6 +57,7 @@ bool read_data(const char* path)
         }
 
         accounts[i] = account;
+        ++current_account_num;
         ++i;
     }
 
@@ -69,7 +71,7 @@ bool update_data(const char* path)
     if(file.fail())
         return false;
 
-    for(int i = 0; i < ACCOUNT_NUM; ++i)
+    for(int i = 0; i < current_account_num; ++i)
         file << accounts[i]->ID << " " << accounts[i]->email << " " << accounts[i]->balance << "\n";
     
     return true;
@@ -79,7 +81,7 @@ int main()
 {
     if(!read_data(FILE_PATH))
     {
-        std::cout << "Something went very wrong. Quitting." << std::endl;
+        std::cout << "Could not find data file. Quitting." << std::endl;
         return 0;
     }
 
@@ -94,7 +96,7 @@ int main()
         std::cout << "How much money would you like to deposit into this account? Enter amount: ";
         std::cin >> temp;
         account->balance += temp;
-        std::cout << "Done! New balance: " << account->balance << "\n";
+        std::cout << "Done! New balance: " << account->balance << std::endl;
 
         if(!update_data(FILE_PATH))
             std::cout << "Could not update data file. Make sure it exists." << std::endl;
