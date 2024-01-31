@@ -13,10 +13,8 @@ struct Account
 
 const char* FILE_PATH = "../Data.txt";
 const int ACCOUNT_NUM = 10;
-int current_account_num = 0;
-Account* accounts[ACCOUNT_NUM];
 
-Account* id_to_account(int ID)
+Account* id_to_account(Account* accounts[], int current_account_num, int ID)
 {
     for(int i = 0; i < current_account_num; ++i)
     {
@@ -27,7 +25,7 @@ Account* id_to_account(int ID)
     return nullptr;
 }
 
-bool read_data(const char* path)
+bool read_data(Account* accounts[], int& current_account_num, const char* path)
 {
     std::fstream file(path, std::ios_base::in);
 
@@ -64,7 +62,7 @@ bool read_data(const char* path)
     return true;
 }
 
-bool update_data(const char* path)
+bool update_data(Account* accounts[], int current_account_num, const char* path)
 {
     std::fstream file(path, std::ios_base::out);
 
@@ -79,7 +77,10 @@ bool update_data(const char* path)
 
 int main()
 {
-    if(!read_data(FILE_PATH))
+    Account* accounts[ACCOUNT_NUM];
+    int current_account_num = 0;
+
+    if(!read_data(accounts, current_account_num, FILE_PATH))
     {
         std::cout << "Could not find data file. Quitting." << std::endl;
         return 0;
@@ -90,15 +91,15 @@ int main()
     std::cout << "Enter account ID to update: ";
     std::cin >> temp;
 
-    if(Account* account = id_to_account((int)temp))
+    if(Account* account = id_to_account(accounts, current_account_num, (int)temp))
     {
-        std::cout << "Currnet balance: " << account->balance << "\n";
+        std::cout << "Current balance: " << account->balance << "\n";
         std::cout << "How much money would you like to deposit into this account? Enter amount: ";
         std::cin >> temp;
         account->balance += temp;
         std::cout << "Done! New balance: " << account->balance << std::endl;
 
-        if(!update_data(FILE_PATH))
+        if(!update_data(accounts, current_account_num, FILE_PATH))
             std::cout << "Could not update data file. Make sure it exists." << std::endl;
     }
     else
